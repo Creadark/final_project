@@ -1,11 +1,11 @@
 package main
 
 import (
+	_ "modernc.org/sqlite"
+
 	"log"
 	"net/http"
 	"os"
-
-	_ "modernc.org/sqlite"
 
 	"github.com/Creadark/final_project/pkg/api"
 	"github.com/Creadark/final_project/pkg/db"

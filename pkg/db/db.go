@@ -1,11 +1,11 @@
 package db
 
 import (
+	_ "modernc.org/sqlite"
+
 	"database/sql"
 	"fmt"
 	"os"
-
-	_ "modernc.org/sqlite"
 )
 
 var db *sql.DB
