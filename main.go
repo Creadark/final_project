@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"os"
 
+	_ "modernc.org/sqlite"
+
 	"github.com/Creadark/final_project/pkg/api"
 	"github.com/Creadark/final_project/pkg/db"
 )
@@ -26,10 +28,10 @@ func GetPort() string {
 
 // SetupAndRun настраивает и запускает сервер
 func SetupAndRun(port string) error {
-    http.Handle("/", http.FileServer(http.Dir(WebDir)))
-    
-    log.Printf("Сервер запускается на порту %s", port)  // Добавлено логирование
-    return http.ListenAndServe(":"+port, nil)
+	http.Handle("/", http.FileServer(http.Dir(WebDir)))
+
+	log.Printf("Сервер запускается на порту %s", port) // Добавлено логирование
+	return http.ListenAndServe(":"+port, nil)
 }
 
 func main() {
