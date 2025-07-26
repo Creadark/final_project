@@ -65,7 +65,7 @@ func Tasks(limit int) ([]*Task, error) {
 // TasksBySearch возвращает задачи по подстроке
 func TasksBySearch(search string, limit int) ([]*Task, error) {
 	query := `
-        SELECT * FROM scheduler 
+        SELECT id, date, title, comment, repeat FROM scheduler 
         WHERE title LIKE ? 
            OR comment LIKE ? 
         ORDER BY date 
@@ -77,7 +77,12 @@ func TasksBySearch(search string, limit int) ([]*Task, error) {
 
 // TasksByDate возвращает задачи на конкретную дату
 func TasksByDate(date string, limit int) ([]*Task, error) {
-	query := "SELECT * FROM scheduler WHERE date = ? ORDER BY date LIMIT ?"
+	query := `
+        SELECT id, date, title, comment, repeat FROM scheduler 
+        WHERE date = ? 
+        ORDER BY date 
+        LIMIT ?
+    `
 	return queryTasks(query, date, limit)
 }
 
@@ -170,13 +175,6 @@ func UpdateTaskDate(id, date string) error {
 	_, err := db.Exec(query, date, id)
 	if err != nil {
 		return fmt.Errorf("ошибка обновления: %v", err)
-	}
-	return nil
-}
-
-func Close() error {
-	if db != nil {
-		return db.Close()
 	}
 	return nil
 }

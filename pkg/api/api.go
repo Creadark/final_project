@@ -27,33 +27,26 @@ func writeJson(w http.ResponseWriter, data any, statusCode int) {
 
 // Обработчик для вычисления следующей даты
 func nextDayHandler(w http.ResponseWriter, r *http.Request) {
-	// Извлекаем параметры из запроса
 	nowStr := r.FormValue("now")
 	dateStr := r.FormValue("date")
 	repeatStr := r.FormValue("repeat")
 
-	// Логируем параметры для отладки
 	log.Printf("Логируем параметры: now=%s, date=%s, repeat=%s", nowStr, dateStr, repeatStr)
 
-	// Преобразуем nowStr в формат time
 	now, err := time.Parse(nextdate.DateFormatYMD, nowStr)
 	if err != nil {
-		http.Error(w, "Ошибка парсинга now", http.StatusBadRequest)
+		writeJSON(w, map[string]string{"error": "неверный формат даты"}, http.StatusBadRequest)
 		return
 	}
 
-	// Преобразуем dateStr в формат time
-	date, err := time.Parse(nextdate.DateFormatYMD, dateStr)
+	nextDate, err := nextdate.NextDate(now, dateStr, repeatStr)
 	if err != nil {
-		http.Error(w, "Ошибка парсинга date", http.StatusBadRequest)
+		writeJSON(w, map[string]string{"error": err.Error()}, http.StatusBadRequest)
 		return
 	}
 
-	nextDate, err := nextdate.NextDate(now, date.Format(nextdate.DateFormatYMD), repeatStr)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Ошибка вычисления следующей даты: %v", err), http.StatusInternalServerError)
-		return
+	// Обработка ошибки записи ответа
+	if _, err := fmt.Fprintf(w, "%s", nextDate); err != nil {
+		log.Printf("Ошибка при записи ответа: %v", err)
 	}
-
-	fmt.Fprintf(w, "%s", nextDate)
 }

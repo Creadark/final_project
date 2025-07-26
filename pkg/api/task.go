@@ -31,7 +31,6 @@ func getTaskHandler(w http.ResponseWriter, r *http.Request) {
 func updateTaskHandler(w http.ResponseWriter, r *http.Request) {
 	var task db.Task
 
-	// Чтение и декодирование JSON
 	body, _ := io.ReadAll(r.Body)
 	if err := json.Unmarshal(body, &task); err != nil {
 		writeJson(w, struct {
@@ -40,7 +39,6 @@ func updateTaskHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Проверка обязательных полей
 	if task.ID == "" {
 		writeJson(w, struct {
 			Error string `json:"error"`
@@ -54,13 +52,11 @@ func updateTaskHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Валидация даты
 	if err := verificationDate(&task); err != nil {
 		writeJson(w, map[string]string{"error": err.Error()}, http.StatusBadRequest)
 		return
 	}
 
-	// Обновление задачи в БД
 	if err := db.UpdateTask(&task); err != nil {
 		writeJson(w, map[string]string{"error": err.Error()}, http.StatusInternalServerError)
 		return
@@ -69,18 +65,12 @@ func updateTaskHandler(w http.ResponseWriter, r *http.Request) {
 	writeJson(w, map[string]string{"status": "успешно обновлено"}, http.StatusOK)
 }
 
-// Обработчик для /api/task, который определяет действие в зависимости от HTTP-метода
 func taskHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost:
 		addTaskHandler(w, r)
 	case http.MethodGet:
-		// Если параметр id отсутствует — возвращаем ошибку
-		if !r.URL.Query().Has("id") {
-			writeJson(w, map[string]string{"error": "параметр id обязателен"}, http.StatusBadRequest)
-			return
-		}
-		getTaskHandler(w, r) // Только для запросов с id
+		getTaskHandler(w, r) // Перенесена проверка id внутрь getTaskHandler
 	case http.MethodPut:
 		updateTaskHandler(w, r)
 	case http.MethodDelete:
