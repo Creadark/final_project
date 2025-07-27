@@ -28,7 +28,7 @@ func Init(dbFile string) error {
 	}
 
 	var err error
-	db, err = sql.Open("sqlite3", dbFile) // Исправлено с "sqlite" на "sqlite3"
+	db, err = sql.Open("sqlite", dbFile)
 	if err != nil {
 		return fmt.Errorf("ошибка открытия базы данных: %w", err)
 	}
